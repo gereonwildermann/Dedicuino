@@ -10,11 +10,11 @@ This wiring uses an Arduino Nano ESP32, I2C OLED, analog pressure sensor, and an
 |---|---|---|
 | OLED (128x64, I2C) | SDA | A4 |
 | OLED (128x64, I2C) | SCL | A5 |
-| OLED (128x64, I2C) | VBUS | 5V |
+| OLED (128x64, I2C) | 5V DC | VBUS |
 | OLED (128x64, I2C) | GND | GND |
-| Pressure Sensor (0.5–4.5V) | OUT | A0 |
-| Pressure Sensor (0.5–4.5V) | VCC | 3.3V |
-| Pressure Sensor (0.5–4.5V) | GND | GND |
+| Pressure Sensor | OUT | A0 |
+| Pressure Sensor| VCC | 3.3V |
+| Pressure Sensor| GND | GND |
 | Thermistor (ATC Semitec 104GT-2) | One end | 3.3V |
 | Thermistor (ATC Semitec 104GT-2) | Other end (sense node) | A1 |
 | Resistor 100k (fixed divider resistor) | One end (sense node) | A1 |
@@ -42,7 +42,7 @@ flowchart LR
     V5[5V] --- O_VCC
     GND --- O_GND
 
-    subgraph PRESS[Pressure Sensor 0.5-4.5V]
+    subgraph PRESS[Pressure Sensor]
       P_OUT[Signal]
       P_VCC[VCC]
       P_GND[GND]

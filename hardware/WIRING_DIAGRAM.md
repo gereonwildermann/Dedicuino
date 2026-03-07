@@ -31,6 +31,7 @@ flowchart LR
     
     subgraph ARDINO[Arduino Nano ESP32]
       NANO --- GND[GND]
+      NANO --- GND2[GND]
       NANO --- V33[3.3V]
       NANO --- A0[A0]
       NANO --- A1[A1]
@@ -52,7 +53,7 @@ flowchart LR
     A4[A4 SDA] --- O_SDA
     A5[A5 SCL] --- O_SCL
     VBUS[VBUS 5V DC] --- O_VDD
-    CommGND --- O_GND
+    GND2 --- O_GND
 
     subgraph PRESS[Pressure Sensor]
       P_OUT[Signal]

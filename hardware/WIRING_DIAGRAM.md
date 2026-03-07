@@ -40,8 +40,8 @@ flowchart LR
       NANO --- VBUS[VBUS 5V DC]
     end 
 
-    GND --- CommGND[(Common GND)]
-    V33 --- CommV33[(Common 3.3V)]
+    GND --- CommGND[(GND)]
+    V33 --- CommV33[(3.3V)]
 
     subgraph OLED[OLED 128x64 I2C]
       O_SDA[SDA]
@@ -67,8 +67,9 @@ flowchart LR
 
     subgraph TEMP[NTC Thermistor Divider]
       TH[104GT-2 Thermistor]
-      TH --- A1
-      A1 --- R100[100k Resistor]
+      A1 --- CommA1[(A1)]
+      TH --- CommA1
+      CommA1 --- R100[100k Resistor]
     end
 
     CommV33 --- TH

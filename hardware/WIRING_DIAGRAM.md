@@ -65,11 +65,14 @@ flowchart LR
     CommGND --- P_GND
 
     subgraph TEMP[NTC Thermistor Divider]
-      CommV33 --- TH[104GT-2 Thermistor]
+      TH[104GT-2 Thermistor]
       TH --- A1
       A1 --- R100[100k Resistor]
-      R100 --- CommGND
     end
+
+    CommV33 --- TH
+    R100 --- CommGND
+
 ```
 
 ## Wiring Checklist

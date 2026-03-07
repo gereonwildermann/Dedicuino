@@ -1,4 +1,4 @@
-# Espresso Machine Display – Arduino Nano ESP32 Project
+# Dedicuino – Arduino Nano ESP32 Project for DeLonghi Dedica EC885/EC685
 
 > **Note**: This is a reimplementation and enhancement of the original [DeLonghi Dedica EC885/EC685 modification by CaiJonas](https://github.com/CaiJonas/DeLonghi-Dedica-EC885-EC685-modification/). This fork uses Arduino Nano ESP32, adds web dashboard, OTA updates, calibration tools, and 3.3V sensor architecture.
 

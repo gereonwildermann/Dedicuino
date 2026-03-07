@@ -1,0 +1,5 @@
+# Local Wi-Fi credentials (must never be committed)
+**/wifi_secrets.h
+
+# Local private branding (must never be committed)
+**/private_brand_logo.h

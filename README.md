@@ -1,10 +1,10 @@
-# Espresso Machine Display – Arduino Nano Project
+# Espresso Machine Display – Arduino Nano ESP32 Project
 
 With this project, you can monitor and visualize the coffee brewing and extraction process by installing a pressure sensor and a temperature sensor. No modifications are made to the machine’s electronics — it is purely a non-invasive monitoring and display system shown on a small screen. This helps in determining the optimal grind size and coffee dose.
 
 For installation, you only need to disconnect the silicone hose between the thermoblock and the outlet. This hose is available as a spare part, so the machine can be fully restored to its original condition at any time. The display is designed in a way that no drilling is required — it uses the original mounting holes of the logo badge.
 
-The system is based on an Arduino Nano with its own power supply. It can be connected without any soldering or modifications to the original circuit board.
+The system is based on an Arduino Nano ESP32 with its own power supply. It can be connected without any soldering or modifications to the original circuit board.
 
 
 ---
@@ -27,13 +27,13 @@ The system is based on an Arduino Nano with its own power supply. It can be conn
 
 | **#** | **Component**                                   | **Quantity** | **Specification**                                              | **Link**                    |
 |-------|--------------------------------------------------|--------------|----------------------------------------------------------------|-----------------------------|
-| 1     | **Arduino Nano**                                 | 1            | Microcontroller                                                 | [Arduino Nano – Arduino Store](https://store.arduino.cc/products/arduino-nano) |
+| 1     | **Arduino Nano ESP32**                           | 1            | Microcontroller                                                 | [Arduino Nano ESP32 – Arduino Store](https://store.arduino.cc/products/nano-esp32) |
 | 2     | **OLED Display**                                 | 1            | 0.96" I2C OLED Display, 128x64                                  | [DIYmall 0.96" OLED Display – Amazon](https://www.amazon.com/DIYmall-Serial-128x64-Display-Arduino/dp/B00O2KDQBE) |
 | 3     | **Resistor (100kΩ)**                             | 1            | 100kΩ, 1/4W                                                     | [100kΩ Resistor 20-pack – LED-Shop](https://www.led-shop.com/Widerstand-1-4W-100k-Ohm-20er-Pack) |
 | 4     | **Thermistor (ATC Semitec 104GT-2)**             | 1            | 100kΩ @ 25°C (NTC)                                              | [JINXIUS 104GT-2 Thermistor – Amazon](https://www.amazon.com/JINXIUS-Temperature-104NT-4-R025H42G-Thermistor-Compatible/dp/B097PBSQYZ) |
 | 5     | **Pressure Sensor G1/4" (DC 5V)**                | 1            | Stainless steel, 0–300 PSI, analog output                       | [Pressure Transmitter G1/4" – Amazon](https://www.amazon.de/Drucktransmitter-Analogsensor-Wasser-Luftkompressor-0-300/dp/B0DPQTX1JR) |
 | 6     | **T-Connector G1/4"-4mm, IQS-MSV**               | 1            | G1/4" female thread, 4mm hose connector                         | [T-Connector G1/4"-4mm – Landefeld](https://www.landefeld.de/artikel/de/t-steckanschluss-innengew-g-14-4mm-iqs-msv-standard-/IQSTFF%20144%20MSV) |
-| 7     | **Hailege 5pcs NANO IO Shield DIY Kit**          | 1            | DIY kit for Arduino Nano (5 pieces)                             | [Hailege Nano IO Shield – Amazon](https://www.amazon.com/Hailege-Shield-Expansion-Board-Arduino/dp/B08D7D8NPL) |
+| 7     | **Nano ESP32-compatible IO breakout/shield**     | 1            | Optional breakout/shield for easier wiring                      | |
 | 8     | **Cables**                                       | -            | Various lengths                                                 | |
 | 9     | **WAGO 2-pin Lever Connector**                   | 2            | -                                                               | [WAGO 2-pin Connector](https://www.wago.com/de/installationsklemmen/verbindungsklemme-mit-hebeln/p/221-412) |
 | 10    | **Screws M2.5x12mm**                             | 2            | M2.5, length: 12mm                                              | [M2.5x12mm Screws – Amazon](https://www.amazon.de/Innensechskant-Au%C3%9Fengewinde-Edelstahl-Anti-Lose-Maschinenbefestigungen-M2-5x12mm/dp/B0BJPLYXK1) |
@@ -81,6 +81,66 @@ replacement hose: https://komtra.de/delonghi-ersatzteile/delonghi-ersatzteile/sc
 ---
 
 ## 🧑‍💻 Installation
+
+### 🔐 Wi-Fi credentials (safe for GitHub)
+
+For ESP32 builds, Wi-Fi credentials are read from a local file:
+
+- Create `firmware/dedicuino_reimplementation/wifi_secrets.h`
+- Add:
+   - `#define WIFI_SSID "your_ssid"`
+   - `#define WIFI_PASSWORD "your_password"`
+   - `#define WIFI_OTA_HOSTNAME "dedicuino"` *(optional)*
+   - `#define WIFI_OTA_PASSWORD "your_ota_password"` *(optional, empty = no OTA auth)*
+
+Use `wifi_secrets.example.h` as template. `wifi_secrets.h` is ignored by git and will not be pushed.
+
+### 🏷️ Private branding (local-only)
+
+The repository stays public-safe by default (no private brand assets committed).
+
+- Optional local splash logo file: `firmware/dedicuino_reimplementation/private_brand_logo.h`
+- Template: `firmware/dedicuino_reimplementation/private_brand_logo.example.h`
+- `private_brand_logo.h` is gitignored and will not be pushed to GitHub.
+
+If `private_brand_logo.h` exists, firmware shows a third splash logo at startup.
+
+### 📡 OTA firmware updates (Arduino Nano ESP32)
+
+After first USB upload, OTA is enabled automatically.
+
+1. Power the device and ensure it connects to the same Wi-Fi network as your computer.
+2. In Arduino IDE, select board **Arduino Nano ESP32**.
+3. In **Tools → Port**, pick the network port named with your OTA hostname (default: `dedicuino`).
+4. Upload as usual.
+
+If OTA password is set, Arduino IDE will ask for it during upload.
+
+### 🌐 Web interface (live dashboard)
+
+The firmware now hosts a live dashboard on the ESP32:
+
+1. Connect phone/PC to the same Wi-Fi network as Dedicuino.
+2. Open browser and go to: `http://dedicuino.local/` (or use the board IP address).
+3. The page auto-refreshes every 500 ms and shows:
+   - current pressure and temperature
+   - shot timer
+   - cup fill progress animation value
+   - avg/max values during and after extraction
+
+### 🧪 Calibration
+
+Standalone calibration sketches are available in [firmware/calibration/README.md](firmware/calibration/README.md):
+
+- [Pressure calibration sketch](firmware/calibration/pressure_sensor_calibration/pressure_sensor_calibration.ino)
+   - OLED shows only `RAW`, `PSI`, `BAR`
+   - Tune `PRESSURE_OFFSET` and `PRESSURE_CAL_FACTOR`
+- [Temperature calibration sketch](firmware/calibration/temperature_sensor_calibration/temperature_sensor_calibration.ino)
+   - OLED shows only `RAW`, `OHM`, `TEMP C`
+   - Tune thermistor constants
+
+JSON telemetry endpoint: `http://dedicuino.local/api/status`
+
 ## 🖥️ **Upload Firmware Using the Arduino IDE**
 
 Follow these steps to upload the firmware to your Arduino using the `.hex` files provided in this repository.

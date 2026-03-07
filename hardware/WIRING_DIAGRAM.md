@@ -63,7 +63,7 @@ flowchart LR
 
     subgraph TEMP[NTC Thermistor Divider]
       V33 --> TH[104GT-2 Thermistor]
-      TH --> A1[A1 Sense Node]
+      TH --> A1
       A1 --> R100[100k Resistor]
       R100 --> GND
     end

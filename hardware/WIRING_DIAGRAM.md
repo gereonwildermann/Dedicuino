@@ -30,14 +30,17 @@ flowchart LR
     PS[5V DC Supply] -->|USB-C| NANO[Arduino Nano ESP32]
     
     subgraph ARDINO[Arduino Nano ESP32]
-      NANO --> GND[(Common GND)]
-      NANO --> V33[3.3V]
-      NANO --> A0[A0]
-      NANO --> A1[A1]
-      NANO --> A4[A4 SDA]
-      NANO --> A5[A5 SCL]
-      NANO --> VBUS[VBUS 5V DC]
+      NANO --- GND[GND]
+      NANO --- V33[3.3V]
+      NANO --- A0[A0]
+      NANO --- A1[A1]
+      NANO --- A4[A4 SDA]
+      NANO --- A5[A5 SCL]
+      NANO --- VBUS[VBUS 5V DC]
     end 
+
+    GND --- CommGND[(Common GND)]
+    V33 --- CommV33[(Common 3.3V)]
 
     subgraph OLED[OLED 128x64 I2C]
       O_SDA[SDA]
@@ -49,7 +52,7 @@ flowchart LR
     A4[A4 SDA] --- O_SDA
     A5[A5 SCL] --- O_SCL
     VBUS[VBUS 5V DC] --- O_VDD
-    GND --- O_GND
+    CommGND --- O_GND
 
     subgraph PRESS[Pressure Sensor]
       P_OUT[Signal]
@@ -58,14 +61,14 @@ flowchart LR
     end
 
     A0[A0] --- P_OUT
-    V33[3.3V] --- P_VCC
-    GND --- P_GND
+    CommV33 --- P_VCC
+    CommGND --- P_GND
 
     subgraph TEMP[NTC Thermistor Divider]
-      V33 --> TH[104GT-2 Thermistor]
-      TH --> A1
-      A1 --> R100[100k Resistor]
-      R100 --> GND
+      CommV33 --- TH[104GT-2 Thermistor]
+      TH --- A1
+      A1 --- R100[100k Resistor]
+      R100 --- CommGND
     end
 ```
 

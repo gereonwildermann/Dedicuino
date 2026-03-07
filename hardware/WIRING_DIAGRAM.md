@@ -1,6 +1,8 @@
 # Dedicuino Reimplementation — Hardware Wiring Diagram
 
-This wiring reproduces the original project behavior with an Arduino Nano ESP32, I2C OLED, analog pressure sensor, and an analog NTC thermistor (ATC Semitec 104GT-2).
+> **Note**: This is a reimplementation of the [original DeLonghi Dedica modification by CaiJonas](https://github.com/CaiJonas/DeLonghi-Dedica-EC885-EC685-modification/), adapted for Arduino Nano ESP32 with 3.3V sensor architecture and USB-C power.
+
+This wiring uses an Arduino Nano ESP32, I2C OLED, analog pressure sensor, and an analog NTC thermistor (ATC Semitec 104GT-2).
 
 ## Pin Mapping
 

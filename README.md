@@ -29,56 +29,14 @@ The system is based on an Arduino Nano ESP32 powered via USB-C (5V). It can be c
 
 ## 📦 Bill of Materials (BOM)
 
-| **#** | **Component**                                   | **Quantity** | **Specification**                                              | **Link**                    |
-|-------|--------------------------------------------------|--------------|----------------------------------------------------------------|-----------------------------|
-| 1     | **Arduino Nano ESP32**                           | 1            | Microcontroller                                                 | [Arduino Nano ESP32 – Arduino Store](https://store.arduino.cc/products/nano-esp32) |
-| 2     | **OLED Display**                                 | 1            | 0.96" I2C OLED Display, 128x64                                  | [DIYmall 0.96" OLED Display – Amazon](https://www.amazon.com/DIYmall-Serial-128x64-Display-Arduino/dp/B00O2KDQBE) |
-| 3     | **Resistor (100kΩ)**                             | 1            | 100kΩ, 1/4W                                                     | [100kΩ Resistor 20-pack – LED-Shop](https://www.led-shop.com/Widerstand-1-4W-100k-Ohm-20er-Pack) |
-| 4     | **Thermistor (ATC Semitec 104GT-2)**             | 1            | 100kΩ @ 25°C (NTC)                                              | [JINXIUS 104GT-2 Thermistor – Amazon](https://www.amazon.com/JINXIUS-Temperature-104NT-4-R025H42G-Thermistor-Compatible/dp/B097PBSQYZ) |
-| 5     | **Pressure Sensor G1/4" (0-300 PSI)**            | 1            | Stainless steel, 0–300 PSI, analog output, 3.3V compatible      | [Pressure Transmitter G1/4" – Amazon](https://www.amazon.de/Drucktransmitter-Analogsensor-Wasser-Luftkompressor-0-300/dp/B0DPQTX1JR) |
-| 6     | **T-Connector G1/4"-4mm, IQS-MSV**               | 1            | G1/4" female thread, 4mm hose connector                         | [T-Connector G1/4"-4mm – Landefeld](https://www.landefeld.de/artikel/de/t-steckanschluss-innengew-g-14-4mm-iqs-msv-standard-/IQSTFF%20144%20MSV) |
-| 7     | **Nano ESP32-compatible IO breakout/shield**     | 1            | Optional breakout/shield for easier wiring                      | |
-| 8     | **USB-C Cable**                                  | 1            | USB-C cable for 5V power supply                                 | |
-| 9     | **Cables**                                       | -            | Various lengths for sensor connections                          | |
-| 10    | **Screws M2.5x12mm**                             | 2            | M2.5, length: 12mm                                              | [M2.5x12mm Screws – Amazon](https://www.amazon.de/Innensechskant-Au%C3%9Fengewinde-Edelstahl-Anti-Lose-Maschinenbefestigungen-M2-5x12mm/dp/B0BJPLYXK1) |
-| 11    | **Screw M4x12mm**                                | 1            | M4, length: 12mm                                                | [M4x12mm Screw – Amazon](https://www.amazon.de/dp/B08BL9PK4N) |
-| 12    | **M2.5 Thread Inserts / T-nuts**                 | 2            | M2.5                                                            | [M2.5 Thread Inserts / T-nuts – Ahltec](https://www.ahltec.de/shop/de/M2-5-Gewindeeinsaetze--Einschlagmuttern-438.html) |
-| 13    | **Thermal Paste**                                | 1            | Standard CPU-compatible thermal paste                           | [ARCTIC MX-4 Thermal Paste – Amazon](https://www.amazon.de/dp/B0795DP124) |
-
-
-
-replacement hose: https://komtra.de/delonghi-ersatzteile/delonghi-ersatzteile/schlauch-l230-mm-klemmverbindung-klemmverbindung.html
+See [hardware/BOM.md](hardware/BOM.md) for the complete list of required components.
 
 ---
 
 ## 🔧 Wiring Diagram & Setup Instructions
 
-Detailed wiring is documented in [hardware/WIRING_DIAGRAM.md](hardware/WIRING_DIAGRAM.md).
+See [hardware/WIRING_DIAGRAM.md](hardware/WIRING_DIAGRAM.md) for detailed wiring instructions.
 
-### 🖥️ OLED Display (I2C)
-- **SDA** → Arduino **A4**
-- **SCL** → Arduino **A5**
-- **GND** → Arduino **GND**
-- **VCC** → Arduino **VBUS** (5V from USB)
-
-### 🌡️ Thermistor (ATC Semitec 104GT-2) & Voltage Divider
-- **Thermistor**:
-  - One end → Arduino **3.3V**
-  - Other end → Arduino **A1**
-- **100kΩ Resistor**:
-  - One end → Arduino **A1**
-  - Other end → Arduino **GND**
-
-### 📈 Pressure Sensor
-- **VCC** → Arduino **3.3V**
-- **GND** → Arduino **GND**
-- **SIGNAL** → Arduino **A0**
-
-### ⚡ Power Supply
-- **USB-C** → Arduino **USB-C port** (5V input)
-
-> ⚠️ **Note**: Sensors are powered from **3.3V rail**, not 5V. OLED uses **VBUS (5V)** for proper brightness. After switching to 3.3V sensors, recalibration is required.
-  
 ---
 
 ## 🧑‍💻 Installation

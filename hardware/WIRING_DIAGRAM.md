@@ -77,6 +77,32 @@ flowchart LR
 
 ```
 
+## Detailed Connection Guide
+
+### 🖥️ OLED Display (I2C)
+- **SDA** → Arduino **A4**
+- **SCL** → Arduino **A5**
+- **GND** → Arduino **GND**
+- **VCC** → Arduino **VBUS** (5V from USB)
+
+### 🌡️ Thermistor (ATC Semitec 104GT-2) & Voltage Divider
+- **Thermistor**:
+  - One end → Arduino **3.3V**
+  - Other end → Arduino **A1**
+- **100kΩ Resistor**:
+  - One end → Arduino **A1**
+  - Other end → Arduino **GND**
+
+### 📈 Pressure Sensor
+- **VCC** → Arduino **3.3V**
+- **GND** → Arduino **GND**
+- **SIGNAL** → Arduino **A0**
+
+### ⚡ Power Supply
+- **USB-C** → Arduino **USB-C port** (5V input)
+
+> ⚠️ **Note**: Sensors are powered from **3.3V rail**, not 5V. OLED uses **VBUS (5V)** for proper brightness. After switching to 3.3V sensors, recalibration is required.
+
 ## Wiring Checklist
 
 - Shared ground between **all** modules.

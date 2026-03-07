@@ -10,7 +10,7 @@ This wiring uses an Arduino Nano ESP32, I2C OLED, analog pressure sensor, and an
 |---|---|---|
 | OLED (128x64, I2C) | SDA | A4 |
 | OLED (128x64, I2C) | SCL | A5 |
-| OLED (128x64, I2C) | 5V DC | VBUS |
+| OLED (128x64, I2C) | VDD | VBUS |
 | OLED (128x64, I2C) | GND | GND |
 | Pressure Sensor | OUT | A0 |
 | Pressure Sensor| VCC | 3.3V |
@@ -33,13 +33,13 @@ flowchart LR
     subgraph OLED[OLED 128x64 I2C]
       O_SDA[SDA]
       O_SCL[SCL]
-      O_VCC[VBUS]
+      O_VDD[VDD]
       O_GND[GND]
     end
 
     A4[A4 SDA] --- O_SDA
     A5[A5 SCL] --- O_SCL
-    V5[5V] --- O_VCC
+    VBUS[VBUS 5V DC] --- O_VDD
     GND --- O_GND
 
     subgraph PRESS[Pressure Sensor]

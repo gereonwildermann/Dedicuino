@@ -29,6 +29,12 @@ This wiring uses an Arduino Nano ESP32, I2C OLED, analog pressure sensor, and an
 flowchart LR
     PS[5V DC Supply] -->|USB-C| NANO[Arduino Nano ESP32]
     NANO --> GND[(Common GND)]
+    NANO --> V33[3.3V]
+    NANO --> A0[A0]
+    NANO --> A1[A1]
+    NANO --> A4[A4 SDA]
+    NANO --> A5[A5 SCL]
+    NANO --> VBUS[VBUS 5V DC]
 
     subgraph OLED[OLED 128x64 I2C]
       O_SDA[SDA]

@@ -1,10 +1,12 @@
 # Espresso Machine Display – Arduino Nano ESP32 Project
 
-With this project, you can monitor and visualize the coffee brewing and extraction process by installing a pressure sensor and a temperature sensor. No modifications are made to the machine’s electronics — it is purely a non-invasive monitoring and display system shown on a small screen. This helps in determining the optimal grind size and coffee dose.
+> **Note**: This is a reimplementation and enhancement of the original [DeLonghi Dedica EC885/EC685 modification by CaiJonas](https://github.com/CaiJonas/DeLonghi-Dedica-EC885-EC685-modification/). This fork uses Arduino Nano ESP32, adds web dashboard, OTA updates, calibration tools, and 3.3V sensor architecture.
+
+With this project, you can monitor and visualize the coffee brewing and extraction process by installing a pressure sensor and a temperature sensor. No modifications are made to the machine's electronics — it is purely a non-invasive monitoring and display system shown on a small screen. This helps in determining the optimal grind size and coffee dose.
 
 For installation, you only need to disconnect the silicone hose between the thermoblock and the outlet. This hose is available as a spare part, so the machine can be fully restored to its original condition at any time. The display is designed in a way that no drilling is required — it uses the original mounting holes of the logo badge.
 
-The system is based on an Arduino Nano ESP32 with its own power supply. It can be connected without any soldering or modifications to the original circuit board.
+The system is based on an Arduino Nano ESP32 powered via USB-C (5V). It can be connected without any soldering or modifications to the original circuit board.
 
 
 ---
@@ -17,7 +19,9 @@ The system is based on an Arduino Nano ESP32 with its own power supply. It can b
 - **Temperature display**: Shows current heater block temperature while brewing, afterwards maximum and average temperature.
 - **Post-shot analysis**: After extraction, the display shows average & maximum pressure and temperature values.
 - **OLED display**: Compact 128x64 I2C screen for clear and minimalistic visualization.
-- **Standalone system**: Powered by mini 12V power supply, does not interfere with the machine’s electronics.
+- **Web dashboard**: Live monitoring via Wi-Fi with auto-refreshing web interface.
+- **OTA updates**: Wireless firmware updates over Wi-Fi.
+- **Standalone system**: Powered by USB-C 5V, does not interfere with the machine's electronics.
 - **3D-printed mounting**: Reuses existing logo mounting holes — no drilling required.
 
 ---
@@ -31,18 +35,15 @@ The system is based on an Arduino Nano ESP32 with its own power supply. It can b
 | 2     | **OLED Display**                                 | 1            | 0.96" I2C OLED Display, 128x64                                  | [DIYmall 0.96" OLED Display – Amazon](https://www.amazon.com/DIYmall-Serial-128x64-Display-Arduino/dp/B00O2KDQBE) |
 | 3     | **Resistor (100kΩ)**                             | 1            | 100kΩ, 1/4W                                                     | [100kΩ Resistor 20-pack – LED-Shop](https://www.led-shop.com/Widerstand-1-4W-100k-Ohm-20er-Pack) |
 | 4     | **Thermistor (ATC Semitec 104GT-2)**             | 1            | 100kΩ @ 25°C (NTC)                                              | [JINXIUS 104GT-2 Thermistor – Amazon](https://www.amazon.com/JINXIUS-Temperature-104NT-4-R025H42G-Thermistor-Compatible/dp/B097PBSQYZ) |
-| 5     | **Pressure Sensor G1/4" (DC 5V)**                | 1            | Stainless steel, 0–300 PSI, analog output                       | [Pressure Transmitter G1/4" – Amazon](https://www.amazon.de/Drucktransmitter-Analogsensor-Wasser-Luftkompressor-0-300/dp/B0DPQTX1JR) |
+| 5     | **Pressure Sensor G1/4" (0-300 PSI)**            | 1            | Stainless steel, 0–300 PSI, analog output, 3.3V compatible      | [Pressure Transmitter G1/4" – Amazon](https://www.amazon.de/Drucktransmitter-Analogsensor-Wasser-Luftkompressor-0-300/dp/B0DPQTX1JR) |
 | 6     | **T-Connector G1/4"-4mm, IQS-MSV**               | 1            | G1/4" female thread, 4mm hose connector                         | [T-Connector G1/4"-4mm – Landefeld](https://www.landefeld.de/artikel/de/t-steckanschluss-innengew-g-14-4mm-iqs-msv-standard-/IQSTFF%20144%20MSV) |
 | 7     | **Nano ESP32-compatible IO breakout/shield**     | 1            | Optional breakout/shield for easier wiring                      | |
-| 8     | **Cables**                                       | -            | Various lengths                                                 | |
-| 9     | **WAGO 2-pin Lever Connector**                   | 2            | -                                                               | [WAGO 2-pin Connector](https://www.wago.com/de/installationsklemmen/verbindungsklemme-mit-hebeln/p/221-412) |
+| 8     | **USB-C Cable**                                  | 1            | USB-C cable for 5V power supply                                 | |
+| 9     | **Cables**                                       | -            | Various lengths for sensor connections                          | |
 | 10    | **Screws M2.5x12mm**                             | 2            | M2.5, length: 12mm                                              | [M2.5x12mm Screws – Amazon](https://www.amazon.de/Innensechskant-Au%C3%9Fengewinde-Edelstahl-Anti-Lose-Maschinenbefestigungen-M2-5x12mm/dp/B0BJPLYXK1) |
 | 11    | **Screw M4x12mm**                                | 1            | M4, length: 12mm                                                | [M4x12mm Screw – Amazon](https://www.amazon.de/dp/B08BL9PK4N) |
 | 12    | **M2.5 Thread Inserts / T-nuts**                 | 2            | M2.5                                                            | [M2.5 Thread Inserts / T-nuts – Ahltec](https://www.ahltec.de/shop/de/M2-5-Gewindeeinsaetze--Einschlagmuttern-438.html) |
-| 13    | **Power Supply Option 1 (EPLZON 12V)**           | 1            | EPLZON 12V/DC 6W Mini LED Transformer                           | [EPLZON 12V Power Supply – Amazon](https://www.amazon.de/EPLZON-Transformator-Leuchten-Stripes-Mindestlastanforderungen/dp/B0DQNP4Z2S) |
-| 14    | **Power Supply Option 2 (Meanwell IRM-03-12S)**  | 1            | Meanwell IRM-03-12S, 12V DC, 3W                                 | [Meanwell IRM-03-12S – Mouser](https://www.mouser.de/ProductDetail/MEAN-WELL/IRM-03-12S?qs=NKmfXavxMaxrQLjk4RvqlA%3D%3D) |
-| 15    | **Piggyback Spade Connector**                    | 2            | Spade connector with additional branch (e.g., 6.3 mm)           | [Piggyback Spade Connector 6.3 mm – Amazon](https://www.amazon.de/-/en/10-Piggy-Backs-5mm%C2%B2-6-red/dp/B005J4QMLI) |
-| 16    | **Thermal Paste**                                | 1            | Standard CPU-compatible thermal paste                           | [ARCTIC MX-4 Thermal Paste – Amazon](https://www.amazon.de/dp/B0795DP124) |
+| 13    | **Thermal Paste**                                | 1            | Standard CPU-compatible thermal paste                           | [ARCTIC MX-4 Thermal Paste – Amazon](https://www.amazon.de/dp/B0795DP124) |
 
 
 
@@ -52,31 +53,31 @@ replacement hose: https://komtra.de/delonghi-ersatzteile/delonghi-ersatzteile/sc
 
 ## 🔧 Wiring Diagram & Setup Instructions
 
+Detailed wiring is documented in [hardware/WIRING_DIAGRAM.md](hardware/WIRING_DIAGRAM.md).
+
 ### 🖥️ OLED Display (I2C)
 - **SDA** → Arduino **A4**
 - **SCL** → Arduino **A5**
 - **GND** → Arduino **GND**
-- **VCC** → Arduino **5V**
+- **VCC** → Arduino **VBUS** (5V from USB)
 
 ### 🌡️ Thermistor (ATC Semitec 104GT-2) & Voltage Divider
 - **Thermistor**:
-  - One end → Arduino **5V**
+  - One end → Arduino **3.3V**
   - Other end → Arduino **A1**
 - **100kΩ Resistor**:
   - One end → Arduino **A1**
   - Other end → Arduino **GND**
 
 ### 📈 Pressure Sensor
-- **VCC** → Arduino **5V**
+- **VCC** → Arduino **3.3V**
 - **GND** → Arduino **GND**
 - **SIGNAL** → Arduino **A0**
 
-### ⚡ Power Supply via Piggyback Connector
-- **The power supply is connected to the board via a piggyback connector**
-- **Positive lead (+)** from power supply → Arduino **VIN**
-- **Ground (−)** from power supply → Arduino **GND**
+### ⚡ Power Supply
+- **USB-C** → Arduino **USB-C port** (5V input)
 
-> ⚠️ **Note**: When powering the Arduino externally, use the **VIN pin**, not the 5V pin. Ensure **GND is shared** across all components for proper reference voltage.
+> ⚠️ **Note**: Sensors are powered from **3.3V rail**, not 5V. OLED uses **VBUS (5V)** for proper brightness. After switching to 3.3V sensors, recalibration is required.
   
 ---
 
@@ -141,36 +142,36 @@ Standalone calibration sketches are available in [firmware/calibration/README.md
 
 JSON telemetry endpoint: `http://dedicuino.local/api/status`
 
-## 🖥️ **Upload Firmware Using the Arduino IDE**
+---
 
-Follow these steps to upload the firmware to your Arduino using the `.hex` files provided in this repository.
+## 🖥️ **Firmware Upload**
 
-### 1. **Download the firmware file**:
-   - Download the **`dedicioni.ino.with_bootloader.hex`** file from the `/firmware` folder in this repository
+### Arduino IDE Setup
 
-### 2. **Open the Arduino IDE**:
-   - Launch the **Arduino IDE** on your computer.
+1. **Install Arduino IDE** (2.0 or later recommended)
+2. **Install Arduino Nano ESP32 board support**:
+   - Go to **Tools** → **Board** → **Boards Manager**
+   - Search for "Arduino ESP32" and install
+3. **Open firmware**: `firmware/dedicuino_reimplementation/dedicuino_reimplementation.ino`
+4. **Select board**: **Tools** → **Board** → **Arduino Nano ESP32**
+5. **Select port**: **Tools** → **Port** → your USB port
+6. **Upload**: Click upload button or **Sketch** → **Upload**
 
-### 3. **Select the correct board and port**:
-   - Go to **Tools** → **Board** and select your Arduino model (e.g., Arduino Uno).
-   - Go to **Tools** → **Port** and select the COM port your Arduino is connected to.
+### Required Libraries
 
-### 4. **Upload the firmware**:
-   - Click on **Sketch** → **Upload Using Programmer**.
-     - If prompted, make sure the programmer is set to **"Arduino as ISP"** (or the programmer you are using).
+Install via **Tools** → **Manage Libraries**:
+- Adafruit GFX Library
+- Adafruit SSD1306
+- ESPAsyncWebServer (ESP32 only)
+- AsyncTCP (ESP32 only)
 
-### 5. **Select the `.hex` file**:
-   - In the file dialog that appears, navigate to the `.hex` file you downloaded earlier.
-   - Select the file and click **Open**.
-
-### 6. **Wait for the upload to finish**:
-   - Once the upload process is completed, your board will automatically start running the new firmware!
+After first upload, you can use OTA updates over Wi-Fi (see OTA section above).
 
 ---
 
 ## 🖨️ 3D Printing the Enclosure
 
-For this project, I designed a custom enclosure that can be made using FDM 3D printing.      
+> **Note**: The 3D enclosure design is from the [original project by CaiJonas](https://github.com/CaiJonas/DeLonghi-Dedica-EC885-EC685-modification/).
 
 1. **Download the 3D Model:**
    - The 3D model for the enclosure is available on **Printables**. You can download it directly from
@@ -261,22 +262,27 @@ _Images of the mounted system go here_
 ---
 
 ## ⚖️ License
-This project is licensed for **private, non-commercial use only**.  
-See `LICENSE` for details or contact the author for other use cases.
+
+This project is based on the [original work by CaiJonas](https://github.com/CaiJonas/DeLonghi-Dedica-EC885-EC685-modification/), licensed for **private, non-commercial use only** (Copyright © 2025 Cai Jonas Schäperkötter).
+
+This fork maintains the same license terms. See `LICENSE` for details or contact the original author at caijonas404@gmail.com for commercial licensing inquiries.
+
+---
+
+## 🙏 Credits
+
+- **Original project**: [CaiJonas/DeLonghi-Dedica-EC885-EC685-modification](https://github.com/CaiJonas/DeLonghi-Dedica-EC885-EC685-modification/)
+- **3D enclosure design**: CaiJonas
+- **This fork**: Arduino Nano ESP32 reimplementation with web dashboard, OTA updates, and calibration tools
+
+If you appreciate the original concept and hardware design, consider supporting CaiJonas:
+
+[![Buy CaiJonas a Coffee](https://img.shields.io/badge/Buy%20CaiJonas%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black&style=for-the-badge)](https://www.buymeacoffee.com/caijonas404)
 
 ---
 
 ## 🤝 Contributing
 Feel free to open issues or submit pull requests!
-
----
-## 💖 Support
-
-If you find this project helpful and would like to support its development, consider buying me a coffee:
-
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black&style=for-the-badge)](https://www.buymeacoffee.com/caijonas404)
-
-Thank you for your support! ☕😊
 
 ---
 

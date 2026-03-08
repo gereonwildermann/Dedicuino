@@ -66,6 +66,9 @@ static const float ADC_MAX_COUNTS = 1023.0f;
 static const uint32_t SAMPLE_INTERVAL_MS = 100;
 static const uint32_t EXTRACT_STOP_HOLD_MS = 300;
 static const uint32_t POST_SHOT_DISPLAY_MS = 60000;
+#if defined(ARDUINO_ARCH_ESP32)
+static const uint32_t WIFI_CHECK_INTERVAL_MS = 10000; // Check WiFi every 10 seconds
+#endif
 
 // ---------- Pressure calibration ----------
 const int ADC_resolution = 12;
@@ -115,6 +118,9 @@ uint32_t lastSampleMs = 0;
 uint32_t shotStartMs = 0;
 uint32_t belowStopSinceMs = 0;
 uint32_t postShotSinceMs = 0;
+#if defined(ARDUINO_ARCH_ESP32)
+uint32_t lastWifiCheckMs = 0;
+#endif
 
 float clampf(float x, float lo, float hi) {
   return (x < lo) ? lo : ((x > hi) ? hi : x);
@@ -293,24 +299,27 @@ void drawPressureIcon(int16_t x, int16_t y) {
 }
 
 void drawCupAnimation(int16_t x, int16_t y, uint32_t now) {
-  // Compact cup icon (14x18) for the top-right timer area.
+  // Compact espresso-style cup icon (15x18) for the top-right timer area.
   // States:
   // - IDLE: empty cup
   // - EXTRACTING: drops + filling cup
   // - POST_SHOT: full cup
 
-  // Cup body and rim
-  display.drawRoundRect(x, y + 3, 10, 12, 2, SSD1306_WHITE);
-  display.drawLine(x + 1, y + 3, x + 8, y + 3, SSD1306_WHITE);
+  // Cup body and rim (wider top, narrower bottom)
+  display.drawLine(x + 0, y + 3, x + 11, y + 3, SSD1306_WHITE); // rim
+  display.drawLine(x + 0, y + 4, x + 11, y + 4, SSD1306_WHITE);
+  display.drawLine(x + 0, y + 5, x + 1, y + 14, SSD1306_WHITE); // left wall
+  display.drawLine(x + 11, y + 5, x + 10, y + 14, SSD1306_WHITE); // right wall
+  display.drawLine(x + 2, y + 14, x + 9, y + 14, SSD1306_WHITE); // bottom
 
   // Cup handle
-  display.drawPixel(x + 10, y + 6, SSD1306_WHITE);
-  display.drawPixel(x + 11, y + 7, SSD1306_WHITE);
-  display.drawPixel(x + 11, y + 8, SSD1306_WHITE);
-  display.drawPixel(x + 10, y + 9, SSD1306_WHITE);
+  display.drawPixel(x + 12, y + 7, SSD1306_WHITE);
+  display.drawPixel(x + 13, y + 8, SSD1306_WHITE);
+  display.drawPixel(x + 13, y + 9, SSD1306_WHITE);
+  display.drawPixel(x + 12, y + 10, SSD1306_WHITE);
 
   // Saucer
-  display.drawLine(x - 1, y + 16, x + 11, y + 16, SSD1306_WHITE);
+  display.drawLine(x - 1, y + 16, x + 13, y + 16, SSD1306_WHITE);
 
   uint8_t fillPercent = 0;
   bool showDrops = false;
@@ -322,15 +331,23 @@ void drawCupAnimation(int16_t x, int16_t y, uint32_t now) {
     fillPercent = 100;
   }
 
-  // Fill level inside cup
+  // Fill level inside tapered cup
   if (fillPercent > 0) {
-    const int16_t innerX = x + 1;
     const int16_t innerY = y + 5;
-    const int16_t innerW = 8;
     const int16_t innerH = 9;
+    const int16_t innerTopLeft = x + 1;
+    const int16_t innerTopW = 10;
+    const int16_t innerBottomLeft = x + 3;
+    const int16_t innerBottomW = 6;
     int16_t fillH = (int16_t)((innerH * fillPercent) / 100);
     if (fillH > innerH) fillH = innerH;
-    display.fillRect(innerX, innerY + (innerH - fillH), innerW, fillH, SSD1306_WHITE);
+
+    for (int16_t row = 0; row < fillH; ++row) {
+      int16_t yRowFromTop = (innerH - 1) - row;
+      int16_t left = innerTopLeft + ((innerBottomLeft - innerTopLeft) * yRowFromTop) / (innerH - 1);
+      int16_t width = innerTopW + ((innerBottomW - innerTopW) * yRowFromTop) / (innerH - 1);
+      display.drawLine(left, innerY + yRowFromTop, left + width - 1, innerY + yRowFromTop, SSD1306_WHITE);
+    }
   }
 
   // Animated coffee drops while extracting
@@ -435,7 +452,7 @@ void drawConnectivityStatus() {
 
   // Top-right compact icon status (WiFi)
   if (wifiConnected) {
-    drawWifiIcon(108, 0);
+    drawWifiIcon(118, 0);
   }
 }
 #endif
@@ -588,6 +605,13 @@ void setupOTA() {
 
   ArduinoOTA.begin();
 }
+
+void checkWiFiConnection() {
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFi.disconnect();
+    WiFi.begin(ssid, password);
+  }
+}
 #endif
 
 void showSplashBitmap(const uint8_t* bitmap, uint8_t width, uint8_t height, uint16_t holdMs) {
@@ -647,6 +671,14 @@ void loop() {
 #endif
 
   uint32_t now = millis();
+
+#if defined(ARDUINO_ARCH_ESP32)
+  // Check WiFi connection every 10 seconds
+  if (now - lastWifiCheckMs >= WIFI_CHECK_INTERVAL_MS) {
+    lastWifiCheckMs = now;
+    checkWiFiConnection();
+  }
+#endif
   if (now - lastSampleMs < SAMPLE_INTERVAL_MS) {
     return;
   }

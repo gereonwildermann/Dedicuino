@@ -313,7 +313,10 @@ void drawCupAnimation(int16_t x, int16_t y, uint32_t now) {
   display.drawLine(x + 2, y + 14, x + 9, y + 14, SSD1306_WHITE); // bottom
 
   // Cup handle
-  display.drawPixel(x + 12, y + 7, SSD1306_WHITE);
+  display.drawPixel(x + 12, y + 4, SSD1306_WHITE);
+  display.drawPixel(x + 13, y + 5, SSD1306_WHITE);
+  display.drawPixel(x + 13, y + 6, SSD1306_WHITE);
+  display.drawPixel(x + 13, y + 7, SSD1306_WHITE);
   display.drawPixel(x + 13, y + 8, SSD1306_WHITE);
   display.drawPixel(x + 13, y + 9, SSD1306_WHITE);
   display.drawPixel(x + 12, y + 10, SSD1306_WHITE);
@@ -333,8 +336,8 @@ void drawCupAnimation(int16_t x, int16_t y, uint32_t now) {
 
   // Fill level inside tapered cup
   if (fillPercent > 0) {
-    const int16_t innerY = y + 5;
-    const int16_t innerH = 9;
+    const int16_t innerY = y + 6;
+    const int16_t innerH = 8;
     const int16_t innerTopLeft = x + 1;
     const int16_t innerTopW = 10;
     const int16_t innerBottomLeft = x + 3;
@@ -346,7 +349,7 @@ void drawCupAnimation(int16_t x, int16_t y, uint32_t now) {
       int16_t yRowFromTop = (innerH - 1) - row;
       int16_t left = innerTopLeft + ((innerBottomLeft - innerTopLeft) * yRowFromTop) / (innerH - 1);
       int16_t width = innerTopW + ((innerBottomW - innerTopW) * yRowFromTop) / (innerH - 1);
-      display.drawLine(left, innerY + yRowFromTop, left + width - 1, innerY + yRowFromTop, SSD1306_WHITE);
+      display.drawLine(left+1, innerY + yRowFromTop, left + width - 2, innerY + yRowFromTop, SSD1306_WHITE);
     }
   }
 

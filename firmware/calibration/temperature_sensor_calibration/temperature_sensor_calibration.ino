@@ -12,6 +12,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // ---------- Pin ----------
 static const uint8_t PIN_TEMP_THERMISTOR = A1;
+static const float THERMISTOR_DIVIDER_SUPPLY_VOLTS = 3.3f;
 
 #if defined(ARDUINO_ARCH_ESP32)
 static const float ADC_MAX_COUNTS = 4095.0f;
@@ -21,10 +22,20 @@ static const float ADC_MAX_COUNTS = 1023.0f;
 
 // ---------- Thermistor model (ATC Semitec 104GT-2 defaults) ----------
 // Adjust these while validating against a trusted thermometer.
-static float THERMISTOR_NOMINAL_OHMS = 100000.0f; // R0 at 25°C
+static float THERMISTOR_NOMINAL_OHMS = (1+0.00)* 100000.0f; // R0 at 25°C +- 3 %
 static float THERMISTOR_NOMINAL_C = 25.0f;
-static float THERMISTOR_BETA = 4267.0f;
-static float THERMISTOR_SERIES_OHMS = 100000.0f;
+static float THERMISTOR_BETA = (1+0.00)* 4267.0f; // +- 3 %
+static float THERMISTOR_SERIES_OHMS = 99100.0f;
+
+#if defined(ARDUINO_ARCH_ESP32)
+float readAveragedMilliVolts(uint8_t pin, uint8_t samples = 8) {
+  uint32_t sum = 0;
+  for (uint8_t i = 0; i < samples; ++i) {
+    sum += (uint32_t)analogReadMilliVolts(pin);
+  }
+  return (float)sum / (float)samples;
+}
+#endif
 
 void setup() {
   pinMode(PIN_TEMP_THERMISTOR, INPUT);
@@ -49,10 +60,18 @@ void loop() {
 
   float tempC = NAN;
   float rTherm = NAN;
+  float nodeVolts = NAN;
 
+  #if defined(ARDUINO_ARCH_ESP32)
+  nodeVolts = readAveragedMilliVolts(PIN_TEMP_THERMISTOR) / 1000.0f;
+  #else
   if (raw > 0 && raw < (int)ADC_MAX_COUNTS) {
-    const float ratio = raw / ADC_MAX_COUNTS;
-    rTherm = THERMISTOR_SERIES_OHMS * ((1.0f / ratio) - 1.0f);
+    nodeVolts = (raw / ADC_MAX_COUNTS) * THERMISTOR_DIVIDER_SUPPLY_VOLTS;
+  }
+  #endif
+
+  if (!isnan(nodeVolts) && nodeVolts > 0.0f && nodeVolts < THERMISTOR_DIVIDER_SUPPLY_VOLTS) {
+    rTherm = THERMISTOR_SERIES_OHMS * ((THERMISTOR_DIVIDER_SUPPLY_VOLTS / nodeVolts) - 1.0f);
 
     if (rTherm > 0.0f) {
       const float t0K = THERMISTOR_NOMINAL_C + 273.15f;

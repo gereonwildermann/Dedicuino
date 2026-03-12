@@ -64,6 +64,7 @@ static const float ADC_MAX_COUNTS = 1023.0f;
 
 // ---------- Timing ----------
 static const uint32_t SAMPLE_INTERVAL_MS = 100;
+static const uint8_t ADC_SAMPLES_PER_UPDATE = 20;
 static const uint32_t EXTRACT_STOP_HOLD_MS = 300;
 static const uint32_t POST_SHOT_DISPLAY_MS = 60000;
 #if defined(ARDUINO_ARCH_ESP32)
@@ -77,11 +78,13 @@ static const float PRESSURE_PSI_MAX = 300.0f;
 static const float PSI_TO_BAR = 0.0689476f;
 static const float PRESSURE_CAL_FACTOR = 1.22f; // Adjust based on calibration against known pressure values
 
-// ---------- Thermistor calibration (ATC Semitec 104GT-2) ----------
+// ---------- Thermistor calibration (ATC Semitec 104NT-4-R025H42G) ----------
+// Data sheet: https://atcsemitec.co.uk/wp-content/uploads/2019/01/Semitec-NT-4-Glass-NTC-Thermistor.pdf
 static const float THERMISTOR_NOMINAL_OHMS = 100000.0f; // 100k at 25°C
 static const float THERMISTOR_NOMINAL_C = 25.0f;
 static const float THERMISTOR_BETA = 4267.0f;
 static const float THERMISTOR_SERIES_OHMS = 100000.0f; // fixed resistor in divider
+static const float THERMISTOR_DIVIDER_SUPPLY_VOLTS = 3.3f;
 
 // Shot detection thresholds (bar)
 static const float SHOT_START_BAR = 1.0f;
@@ -126,8 +129,26 @@ float clampf(float x, float lo, float hi) {
   return (x < lo) ? lo : ((x > hi) ? hi : x);
 }
 
+float readAveragedADC(uint8_t pin) {
+  uint32_t sum = 0;
+  for (uint8_t i = 0; i < ADC_SAMPLES_PER_UPDATE; ++i) {
+    sum += (uint32_t)analogRead(pin);
+  }
+  return (float)sum / (float)ADC_SAMPLES_PER_UPDATE;
+}
+
+#if defined(ARDUINO_ARCH_ESP32)
+float readAveragedMilliVolts(uint8_t pin) {
+  uint32_t sum = 0;
+  for (uint8_t i = 0; i < ADC_SAMPLES_PER_UPDATE; ++i) {
+    sum += (uint32_t)analogReadMilliVolts(pin);
+  }
+  return (float)sum / (float)ADC_SAMPLES_PER_UPDATE;
+}
+#endif
+
 float readPressureBar() {
-  int raw = analogRead(PIN_PRESSURE);
+  float raw = readAveragedADC(PIN_PRESSURE);
   int offset = 343;
   float norm = ((raw - offset)/(raw_max - offset));
   // norm = clampf(norm, 0.0f, 1.0f);
@@ -136,19 +157,24 @@ float readPressureBar() {
 }
 
 float readAnalogTempC() {
-  int raw = analogRead(PIN_TEMP_THERMISTOR);
+  float nodeVolts = NAN;
+
+  #if defined(ARDUINO_ARCH_ESP32)
+  nodeVolts = readAveragedMilliVolts(PIN_TEMP_THERMISTOR) / 1000.0f;
+  #else
+  float raw = readAveragedADC(PIN_TEMP_THERMISTOR);
+  if (raw > 0.0f && raw < ADC_MAX_COUNTS) {
+    nodeVolts = (raw / ADC_MAX_COUNTS) * THERMISTOR_DIVIDER_SUPPLY_VOLTS;
+  }
+  #endif
 
   // Protect against division by zero at rail values.
-  if (raw <= 0 || raw >= (int)ADC_MAX_COUNTS) {
+  if (isnan(nodeVolts) || nodeVolts <= 0.0f || nodeVolts >= THERMISTOR_DIVIDER_SUPPLY_VOLTS) {
     return tempCFiltered;
   }
 
   // Divider: Thermistor to 3.3V, fixed resistor to GND, node to ADC.
-  const float ratio = raw / ADC_MAX_COUNTS;
-  const float rTherm = THERMISTOR_SERIES_OHMS * ((1.0f / ratio) - 1.0f);
-  if (rTherm <= 0.0f) {
-    return tempCFiltered;
-  }
+  const float rTherm = THERMISTOR_SERIES_OHMS * ((THERMISTOR_DIVIDER_SUPPLY_VOLTS / nodeVolts) - 1.0f);
 
   // Beta model
   const float t0K = THERMISTOR_NOMINAL_C + 273.15f;

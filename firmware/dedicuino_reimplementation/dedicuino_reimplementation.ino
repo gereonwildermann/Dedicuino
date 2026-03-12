@@ -83,7 +83,7 @@ static const float PRESSURE_CAL_FACTOR = 1.22f; // Adjust based on calibration a
 static const float THERMISTOR_NOMINAL_OHMS = 100000.0f; // 100k at 25°C
 static const float THERMISTOR_NOMINAL_C = 25.0f;
 static const float THERMISTOR_BETA = 4267.0f;
-static const float THERMISTOR_SERIES_OHMS = 100000.0f; // fixed resistor in divider
+static const float THERMISTOR_SERIES_OHMS = 99100.0f; // fixed resistor in divider
 static const float THERMISTOR_DIVIDER_SUPPLY_VOLTS = 3.3f;
 
 // Shot detection thresholds (bar)
